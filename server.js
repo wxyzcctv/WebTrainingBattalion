@@ -10,8 +10,7 @@ http.createServer((request, response) => {
         body = (Buffer.concat([Buffer.from(body.toString())])).toString();
         console.log("body:", body);
         response.writeHead(200, { 'Content-type': 'text/html' })
-        response.end(
-            `<html maaa=a>
+        response.end(`<html maaa=a>
 <head>
     <style>
 body div #myid{
