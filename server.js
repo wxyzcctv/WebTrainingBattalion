@@ -10,7 +10,28 @@ http.createServer((request, response) => {
         body = (Buffer.concat([Buffer.from(body.toString())])).toString();
         console.log("body:", body);
         response.writeHead(200, { 'Content-type': 'text/html' })
-        response.end(' Hello World\n')
+        response.end(
+            `<html maaa=a>
+<head>
+    <style>
+body div #myid{
+    width:100px;
+    backgorund-color: #ff5000;
+}
+body div img{
+    width:30px;
+    backgorund-color: #ff1111;
+}   
+    </style>
+</head>
+<body>
+    <div>
+        <img id="mydiv">
+        <img />
+    </div>
+</body>
+</html>
+`)
     })
 }).listen(8088)
 
