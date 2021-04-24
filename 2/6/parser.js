@@ -1,11 +1,11 @@
 let currentToken = null
 let currentAttribute = null
 
-let stack = [{type:"document",children:[]}]
+let stack = [{ type: "document", children: [] }]
 
 function emit(token) {
     if (token.type === 'text') return;
-    let top = stack[stack.length -1];
+    let top = stack[stack.length - 1];
 
     if (token.type === "startTag") {
         let element = {
@@ -135,7 +135,7 @@ function beforAttributeName(c) {
     }
 }
 
-function attributeName(c){
+function attributeName(c) {
     if (c.match(/^[\t\n\f ]$/) || c === '/' || c === '>' || c === EOF) {
         // 属性名状态中遇到空格、/、>、EOF就进入到属性名之后的状态机，表示已经获取到了属性名
         return afterAttributeName(c)
@@ -143,16 +143,16 @@ function attributeName(c){
         // 属性名后紧跟的是=就条状到属性值状态处理前
         return beforAttributeValue;
     } else if (c === '\u0000') {
-        
+
     } else if (c === '\"' || c === "" || c === "<") {
-        
+
     } else {
         currentAttribute.name += c
         return attributeName;
     }
 }
 
-function beforAttributeValue(c){
+function beforAttributeValue(c) {
     if (c.match(/^[\t\n\f ]$/) || c === "/" || c === ">" || c === EOF) {
         return beforAttributeValue;
     } else if (c === "\"") {
@@ -175,9 +175,9 @@ function doubleQuotedAttributeValue(c) {
         currentToken[currentAttribute.name] = currentAttribute.value;
         return afterQuotedAttributeValue;
     } else if (c === "\u0000") {
-        
+
     } else if (c === EOF) {
-        
+
     } else {
         // 不然就保存获取到的属性值
         currentAttribute.value += c;
@@ -191,9 +191,9 @@ function singleQuotedAttributeValue(c) {
         currentToken[currentAttribute.name] = currentAttribute.value;
         return afterQuotedAttributeValue;
     } else if (c === "\u0000") {
-        
+
     } else if (c === EOF) {
-        
+
     } else {
         // 不然就保存获取到的属性值
         currentAttribute.value += c;
@@ -214,11 +214,11 @@ function UnquotedAttributeValue(c) {
         emit(currentToken)
         return data;
     } else if (c === "\u0000") {
-        
+
     } else if (c === "\"" || c === "'" || c === "<" || c === "=" || c === "`") {
-        
+
     } else if (c === EOF) {
-        
+
     } else {
         // 不然就保存获取到的属性值
         currentAttribute.value += c;
@@ -231,12 +231,12 @@ function afterQuotedAttributeValue(c) {
         return beforAttributeName
     } else if (c === "/") {
         return selfClosingStartTag
-    } else if (c===">") {
+    } else if (c === ">") {
         currentToken[currentAttribute.name] = currentAttribute.value
         emit(currentToken);
         return data;
     } else if (c === EOF) {
-        
+
     } else {
         currentAttribute.value += c;
         return doubleQuotedAttributeValue
@@ -255,7 +255,7 @@ function afterAttributeName(c) {
         emit(currentToken)
         return data
     } else if (c === EOF) {
-        
+
     } else {
         currentToken[currentAttribute.name] = currentAttribute.value
         currentAttribute = {
@@ -286,4 +286,5 @@ module.exports.parserHTML = function parserHTML(html) {
         state = state(c);
     }
     state = state(EOF); // 使用symbol的唯一性作为状态机的结束状态
+    console.log(stack[0]);
 }

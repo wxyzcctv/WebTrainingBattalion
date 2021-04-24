@@ -25,7 +25,7 @@ body div img{
 </head>
 <body>
     <div>
-        <img id="mydiv">
+        <img id="mydiv" />
         <img />
     </div>
 </body>
