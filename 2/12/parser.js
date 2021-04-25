@@ -46,7 +46,7 @@ function computedCSS(element) {
 
     for (let rule of rules) {
         var selectorParts = rule.selectors[0].split(" ").reverse();
-        if (!match(elemet, selectorParts[0])) {
+        if (!match(element, selectorParts[0])) {
             continue
         }
         let matched = false;
@@ -56,7 +56,7 @@ function computedCSS(element) {
                 j++
             }
         }
-        if (j >= selectorPats.length) {
+        if (j >= selectorParts.length) {
             matched = true
         }
         if (matched) {
