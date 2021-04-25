@@ -14,37 +14,10 @@ function addCSSRules(text) {
     rules.push(...ast.stylesheet.rules)
 }
 
-function match(element, selector) {
-
-}
-
 // css的计算是假定在startTag入栈时，此处假设所有的css规则已经收集完毕了
 function computedCSS(element) {
     // 一个数组调用slice方法不传参数时表示对该数组进行了复制，在调用一下reverse是为了实现匹配元素是从内向外匹配
-    var elements = stack.slice().reverse();
-    if (!element.computedStyle) {
-        element.computedStyle = {};
-    }
-
-    for (let rule of rules) {
-        var selectorParts = rule.selectors[0].split(" ").reverse();
-        if (!match(elemet, selectorParts[0])) {
-            continue
-        }
-        let matched = false;
-        var j = 1;
-        for (let i = 0; i < elements.length; i++) {
-            if (match(elements[i], selectorParts[j])) {
-                j++
-            }
-        }
-        if (j >= selectorPats.length) {
-            matched = true
-        }
-        if (matched) {
-            console.log("Element", element, "match rule", rule);
-        }
-    }
+    var elements = stack.slice().reverse()
 }
 
 function emit(token) {
