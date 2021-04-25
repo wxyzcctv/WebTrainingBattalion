@@ -15,7 +15,25 @@ function addCSSRules(text) {
 }
 
 function match(element, selector) {
-
+    if (!element.attributes || !selector) {
+        return false
+    }
+    if (selector.charAt(0) === "#") {
+        var attr = element.attributes.filter(attr => attr.name === 'id')[0];
+        if (attr && attr.value === selector.replace('#', "")) {
+            return true
+        }
+    } else if (selector.charAt(0) === ".") {
+        var attr = element.attributes.filter(attr => attr.name === "class")[0];
+        if (attr && attr.value === selector.replace(".", "")) {
+            return true
+        }
+    } else {
+        if (element.tagName === selector) {
+            return true
+        }
+    }
+    return false
 }
 
 // css的计算是假定在startTag入栈时，此处假设所有的css规则已经收集完毕了
