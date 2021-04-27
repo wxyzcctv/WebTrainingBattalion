@@ -123,36 +123,45 @@ function layout(element) {
         elementStyle[mainSize] = 0;
         for (let i = 0; i < items.length; i++) {
             var item = items[i];
+            // 如果子元素的主轴尺寸不为null或者0时，主轴尺寸就等于所有子元素主轴尺寸之和
             if (itemStyle[mainSize] !== null || itemStyle[mainSize] !== (void 0)) {
                 elementStyle[mainSize] = elementStyle[mainSize] + itemStyle[mainSize]
             }
         }
         isAutoMainSize = true;
     }
-
+    // 定义一个数组用于装每一行的元素
     var flexLine = [];
+    // 定义flex布局数组用于装下所有行
     var flexLines = [flexLine];
-
+    // 获取父元素的主轴尺寸大小
     var mainSpace = elementStyle[mainSize];
+    // 定义交叉轴尺寸大小
     var crossSpace = 0;
-
+    // 循环遍历每一个元素
     for (let i = 0; i < items.length; i++) {
         var item = items[i];
+        // 获取每一个元素的样式
         var itemStyle = getStyle(item);
-
+        // 如果遍历的当前元素没有主轴尺寸就定义其主轴尺寸大小为0
         if (itemStyle[mainSize] === null) {
             itemStyle[mainSize] = 0;
         }
-
         if (itemStyle.flex) {
+            // 如果遍历的当前元素具有flex属性，就将当前元素加入到flex布局中的一行中
             flexLine.push(item);
         } else if (style.flexWrap === "nowrap" && isAutoMainSize) {
+            // 不需要换行的情况
+            // 如果父元素具有nowrap属性并且排除了装一行的情况，每次遍历主轴尺寸减去当前元素主抽尺寸
             mainSpace -= itemStyle[mainSize];
+            // 如果当前元素的交叉轴尺寸不为0就与之前的较差轴尺寸进行比较大小，获取最大的交叉轴尺寸
             if (itemStyle[crossSize] !== null && itemStyle[crossSize] !== (void 0)) {
                 crossSpace = Math.max(crossSpace, itemStyle[crossSize]);
             }
+            // 将该元素加入flex中的一行中
             flexLine.push(item)
         } else {
+            // 需要换行的情况
             // 如果子元素的尺寸比父元素的尺寸大就将子元素的尺寸压缩到父元素尺寸
             if (itemStyle[mainSize] > style[mainSize]) {
                 itemStyle[mainSize] = style[mainSize]
@@ -170,12 +179,15 @@ function layout(element) {
                 mainSize = style[mainSize]
                 crossSpace = 0;
             } else {
+                // 当前元素能放入flex中的一行中就直接放入
                 flexLine.push(item)
             }
+            // 获取最大交叉轴的值
             if (itemStyle[crossSize !== null && itemStyle[crossSize] !== (void 0)]) {
                 crossSpace = Math.max(crossSpace, itemStyle[crossSize]);
 
             }
+            // 没变遍历一次主轴减一次当前元素的主轴尺寸
             mainSpace -= itemStyle[mainSize]
         }
     }
