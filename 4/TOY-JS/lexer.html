@@ -1,0 +1,55 @@
+<pre>
+<script>
+
+    function compileRegExg(xregexp, name) {
+        if (xregexp[name] instanceof RegExp) {
+            return xregexp[name].source
+        }
+        console.log(name);
+        let regexp = xregexp[name].replace(/\<([^>]+)\>/g, function (str, $1) {
+            return compileRegExg(xregexp, $1)
+        })
+        return regexp;
+    }
+
+    function scan(str) {
+        let regexp = new RegExp(compileRegExg({
+            InputElement: "<Whitespace>|<LineTerminator>|<Comments>|<Token>",
+            Whitespace: / /,
+            LineTerminator: /\n/,
+            Comments: /\/\*([^*]|\*[^\/])*\*\/|\/\/[^\n]*/,
+            Token: "<Literal>|<Keywords>|<Identifer>|<Punctuator>",
+            Literal: "<NumericLiteral>|<BooleanLiteral>|<StringLiteral>|<NullLiteral>",
+            NumericLiteral: /([1-9][0-9]*|0)(\.[0-9]*)?|\.[0-9]+/,
+            BooleanLiteral: /true|false/,
+            StringLiteral: /\"([^"\n]|\\[\s\S])*\"|\'([^'\n]|\\[\s\S])*\'/,
+            NullLiteral: /null/,
+            Identifer: /[a-zA-z_$][a-zA-Z0-9_$]*/,
+            Keywords: /if|else|for|function|let/,
+            Punctuator: /\,|\+|\?|\:|\{|\}|\.|\(|\=|\<|\+\+|\=\=\=|\=\>|\*|\)|\[|\]|;/,
+        }, "InputElement"), "g");
+
+        // 正则中[\s\S]表示任意字符,Token中Keywords一定是在Identifer之前
+        while (regexp.lastIndex < str.length) {
+            let r = regexp.exec(str)
+            console.log(JSON.stringify(r[0]));
+
+            document.write(r[0]);
+            if (!r[0].length)
+                break;
+        }
+    }
+    scan(`
+        for (let i = 0; i < 3; i++) {
+            for (let j = 0; j < 3; j++) {
+                let cell = decument.createElement("div");
+                cell.classList.add("cell");
+                cell.innerText = pattern[i * 3 + j] === 2 ? "×" : pattern[i * 3 + j] === 1 ? "O" : "";
+                cell.addEventListener("click", () => userMove(j, i));
+                board.appendChild(cell);             
+            }
+            board.appendChild(document.createElement("br"))
+        }
+    `)
+</script>
+</pre>

@@ -40,7 +40,7 @@ function layout(element) {
 
     // 对于width和height为auto或者为""统一置空
     ['width', 'height'].forEach(size => {
-        if (style[size] === "auto" || style[size] === "") {
+        if (style[size] === "auto" || style[size] === '') {
             style[size] = null
         }
     })
@@ -176,14 +176,14 @@ function layout(element) {
                 // 将新行加入到flex布局数组中
                 flexLines.push(flexLine)
                 // 重置主轴尺寸和交叉轴尺寸
-                mainSize = style[mainSize]
+                mainSpace = style[mainSize]
                 crossSpace = 0;
             } else {
                 // 当前元素能放入flex中的一行中就直接放入
                 flexLine.push(item)
             }
             // 获取最大交叉轴的值
-            if (itemStyle[crossSize !== null && itemStyle[crossSize] !== (void 0)]) {
+            if (itemStyle[crossSize] !== null && itemStyle[crossSize] !== (void 0)) {
                 crossSpace = Math.max(crossSpace, itemStyle[crossSize]);
 
             }
@@ -248,6 +248,7 @@ function layout(element) {
                 var currentMain = mainBase;
                 for (let i = 0; i < items.length; i++) {
                     var item = items[i];
+                    var itemStyle = getStyle(item)
 
                     // 计算具有flex值的元素的主轴尺寸实际填充的主轴尺寸大小
                     if (itemStyle.flex) {
@@ -285,6 +286,8 @@ function layout(element) {
                 // 获取每一个元素的定位
                 for (let i = 0; i < items.length; i++) {
                     var item = items[i];
+
+                    // 感觉此处少了一行代码
                     itemStyle[mainStart] = currentMain;
                     itemStyle[mainEnd] = itemStyle[mainStart] + mainSign * itemStyle[mainSize];
                     currentMain = itemStyle[mainEnd] + step;
@@ -359,7 +362,7 @@ function layout(element) {
             var align = itemStyle.alignSelf || style.alignItems;
 
             // 如果没有指定元素的交叉轴尺寸就通过stretch属性进行判断
-            if (itemStyle[crossSize] === null) {
+            if (item === null) {
                 itemStyle[crossSize] = (align === 'stretch') ? lineCrossSize : 0
             }
             if (align === 'flex-start') {
