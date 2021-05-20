@@ -116,28 +116,40 @@ Keywords ::= "if" | "else" | "for" | "function" | ...
 Punctuator ::= "+" | "-" | "*" | "/" | "{" | "}" | ...
 
 ```
-
+## 语法输入
+- 程序最顶层的名字一般都是Program
 ```
-Program ::= Statement + 
-
+Program ::= Statement+ 
+```
+- Statement表示语句，Program是由多条Statement组成的
+- - Statement中包含有：表达式、if判断、for循环、while循环、变量声明、函数声明、类声明、循环中的break、continue、return、throw、try、块
+```
 Statement ::= ExpressionStatement | IfStatement | ForStatement | WhileStatement | VariableDeclaration | FuntionDeclaration | ClassDeclaration | BreakStatement | ContinueStatement | ReturnStatement | ThrowStatement | TryStatement | Block
-
+```
+- IfStatement
+```
 IfStatement ::= "if" "(" Expression ")" Statement
-
+```
+- Block
+```
 Block ::= "{" Statement "}"
-
+```
+- TryStatement
+```
 TryStatement ::= "try" "{" Statement+ "}" "catch" "(" Expression ")" "{" Statement+ "}"
-
+```
+- ExpressionStatement
+```
 ExpressionStatement ::= Expression ";"
 
 Expression ::= AdditiveExpression
-
+// 四则运算
 AdditiveExpression ::= MultiplicativeExpression | AdditiveExpression ("+" | "-") MultiplicativeExpression
-
+// 乘法运算
 MultiplicativeExpression ::= UnaryExpression | MultiplicativeExpression ("*" | "/") UnaryExpression
-
+// 一元运算
 UnaryExpression ::= PrimaryExpression | ("+" | "-" | "typeof") PrimaryExpression
-
+// 优先运算
 PrimaryExpression ::= "(" Expression ")" | Literal | Identifier
 
 ```
