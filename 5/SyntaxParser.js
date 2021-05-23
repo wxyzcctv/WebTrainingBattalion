@@ -44,7 +44,11 @@ let syntax = {
         ["Identifier"]
     ],
     Literal: [
-        ["Number"]
+        ["Number"],
+        ["String"],
+        ["Boolean"],
+        ["Null"],
+        ["RegularExpression"]
     ]
 }
 
