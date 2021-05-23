@@ -105,11 +105,6 @@ let start = {
 
 closure(start)
 
-let source = `
-    var a;
-`
-
-
 function parse(source) {
     let stack = [start];
     let symbolStack = []
@@ -144,7 +139,43 @@ function parse(source) {
         // 此处的symbol为terminal symbol
         shift(symbol)
     }
-    console.log(reduce())
+    return reduce()
 }
 
-parse(source)
+let evaluator = {
+    Program(node) {
+        return evaluate(node.children[0])
+    },
+    StatementList(node) {
+        if (node.children.length === 1) {
+            return evaluate(node.children[0])
+        } else {
+            evaluate(node.children[0]);
+            return evaluate(node.children[1]);
+        }
+    },
+    Statement(node) {
+        return evaluate(node.children[0])
+    },
+    VariableDeclaration(node) {
+        console.log("Declare variable", node.children[1].name);
+    },
+    EOF() {
+        return null
+    }
+}
+
+function evaluate(node) {
+    if (evaluator[node.type]) {
+        return evaluator[node.type](node)
+    }
+}
+
+let source = `
+    let a;
+    let b;
+`
+
+let tree = parse(source);
+
+evaluate(tree)
