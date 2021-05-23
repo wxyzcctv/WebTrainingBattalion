@@ -1,7 +1,7 @@
 import { scan } from './LexParser.js'
 
 let syntax = {
-    Program: [["StatementList"]],
+    Program: [["StatementList", 'EOF']],
     StatementList: [
         ["Statement"],
         ["StatementList", "Statement"]
@@ -56,7 +56,10 @@ function closure(state) {
     hash[JSON.stringify(state)] = state
     let queue = [];
     // 遍历传入的state对象,将传入的state对象中的key存入queue队列中
-    for (const symbol in state) {
+    for (let symbol in state) {
+        if (symbol.match(/^\$/)) {
+            continue;
+        }
         queue.push(symbol);
     }
     // 循环遍历整个队列
@@ -71,20 +74,20 @@ function closure(state) {
                     queue.push(rule[0])
                 }
                 let current = state;
-                for (const part of rule) {
+                for (let part of rule) {
                     if (!current[part]) {
                         current[part] = {}
                     }
                     current = current[part]
                 }
                 current.$reduceType = symbol;
-                current.$reduceSate = state;
+                current.$reduceLength = rule.length;
             }
         }
     }
     for (let symbol in state) {
-        if (symbol.match(/^$/)) {
-            return;
+        if (symbol.match(/^\$/)) {
+            continue;
         }
         if (hash[JSON.stringify(state[symbol])]) {
             state[symbol] = hash[JSON.stringify(state[symbol])]
@@ -103,22 +106,45 @@ let start = {
 closure(start)
 
 let source = `
-    let a;
+    var a;
 `
-function parse(source) {
-    let state = start;
-    for (const symbol of scan(source)) {
-        // 此处的symbol为terminal symbol
-        if (symbol.type in state) {
-            state = state[symbol.type]
-        } else {
-            if (state.$reduceType) {
-                state = state.$reduceSate
-            }
-        }
-        console.log(symbol);
-    }
 
+
+function parse(source) {
+    let stack = [start];
+    let symbolStack = []
+    function reduce() {
+        let state = stack[stack.length - 1];
+        if (state.$reduceType) {
+            let children = [];
+            for (let i = 0; i < state.$reduceLength; i++) {
+                stack.pop()
+                children.push(symbolStack.pop())
+            }
+            // 创建一个非终结符
+            return {
+                type: state.$reduceType,
+                children: children.reverse()
+            }
+        } else {
+            throw new Error('unexpected token')
+        }
+    }
+    function shift(symbol) {
+        let state = stack[stack.length - 1];
+        if (symbol.type in state) {
+            stack.push(state[symbol.type]);
+            symbolStack.push(symbol)
+        } else {
+            shift(reduce());
+            shift(symbol);
+        }
+    }
+    for (let symbol of scan(source)) {
+        // 此处的symbol为terminal symbol
+        shift(symbol)
+    }
+    console.log(reduce())
 }
 
 parse(source)
