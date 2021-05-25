@@ -225,6 +225,38 @@ let evaluator = {
         console.log(value);
         // return evaluate(node.children[0]);
     },
+    StringLiteral(node) {
+
+        let result = [];
+
+        for (let i = 1; i < node.value.length - 1; i++) {
+            if (node.value[i] === '\\') {
+                ++i;
+                let c = node.value[i];
+                let map = {
+                    "\"": "\"",
+                    "\'": "\'",
+                    "\\": "\\",
+                    "0": String.fromCharCode(0x0000),
+                    "b": String.fromCharCode(0x0008),
+                    "f": String.fromCharCode(0x000C),
+                    "n": String.fromCharCode(0x000A),
+                    "r": String.fromCharCode(0x000D),
+                    "t": String.fromCharCode(0x0009),
+                    "v": String.fromCharCode(0x000B),
+                };
+                if (c in map) {
+                    result.push(map[c]);
+                } else {
+                    result.push(c);
+                }
+            } else {
+                result.push(node.value[i])
+            }
+        }
+        console.log(result);
+        return result.join("");
+    }
 }
 
 function evaluate(node) {
@@ -233,10 +265,8 @@ function evaluate(node) {
     }
 }
 
-let source = `
-    0xFF;
-`
+//////////////////////////////////////////
 
-let tree = parse(source);
-
-evaluate(tree)
+window.js = {
+    evaluate, parse
+}
