@@ -48,8 +48,23 @@ let syntax = {
         ["StringLiteral"],
         ["BooleanLiteral"],
         ["NullLiteral"],
-        ["RegularExpression"]
-    ]
+        ["RegularExpressionLiteral"],
+        ["ObjectLiteral"],
+        ["ArrayLiteral"],
+    ],
+    ObjectLiteral: [
+        ["{", "}"], // 运行空
+        ["{", "PropertyList", "}"]
+    ],
+    PropertyList: [
+        ["Property"],
+        ["PropertyList", ",", "Property"],
+    ],
+    Property: [
+        ["StringLiteral", ":", "AdditiveExpression"],
+        ["Identifier", ":", "AdditiveExpression"]
+    ],
+
 }
 
 let hash = {
@@ -256,6 +271,24 @@ let evaluator = {
         }
         console.log(result);
         return result.join("");
+    },
+    ObjectLiteral(node) {
+        if (node.children.length === 2) {
+            return {}
+        }
+        if (node.children.length === 3) {
+            let object = new Map();
+
+            // object.prototype = 
+            return object;
+        }
+
+    },
+    PropertyList(node, Object) {
+
+    },
+    Property(node, Object) {
+
     }
 }
 
