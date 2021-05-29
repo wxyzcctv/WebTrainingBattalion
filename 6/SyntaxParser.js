@@ -26,6 +26,10 @@ let syntax = {
         ["Expression", ";"]
     ],
     Expression: [
+        ["AssignmentExpression"]
+    ],
+    AssignmentExpression: [
+        ["Identifier", "=", "AdditiveExpression"],
         ["AdditiveExpression"]
     ],
     AdditiveExpression: [
@@ -184,15 +188,26 @@ class EnvironmentRecord {
 class ExecutionContext {
     constructor() {
         this.lexicalEnvironment = {};
-        this.variableEnvironment = {};
+        this.variableEnvironment = this.lexicalEnvironment;
         this.realm = {
 
         }
     }
 }
 
-let realm = new Realm();
-let ecs = [new ExecutionContext]
+
+class Reference {
+    constructor(object, property) {
+        this.object = object;
+        this.property = property
+    }
+    set(value) {
+        this.object[this.property] = value;
+    }
+    get() {
+        return this.object[this.property]
+    }
+}
 
 let evaluator = {
     Program(node) {
@@ -210,7 +225,8 @@ let evaluator = {
         return evaluate(node.children[0])
     },
     VariableDeclaration(node) {
-        console.log("Declare variable", node.children[1].name);
+        let runningEC = ecs[ecs.length - 1];
+        runningEC.variableEnvironment[node.children[1].name];
     },
     ExpressionStatement(node) {
         return evaluate(node.children[0])
@@ -270,7 +286,7 @@ let evaluator = {
             }
             value = value * n + c;
         }
-        console.log(value);
+        //console.log(value);
         return value;
         // return evaluate(node.children[0]);
     },
@@ -303,7 +319,7 @@ let evaluator = {
                 result.push(node.value[i])
             }
         }
-        console.log(result);
+        //console.log(result);
         return result.join("");
     },
     ObjectLiteral(node) {
@@ -314,7 +330,7 @@ let evaluator = {
             let object = new Map();
             this.PropertyList(node.children[1], object)
             // object.prototype = 
-            console.log(object)
+            //console.log(object)
             return object;
         }
 
@@ -340,12 +356,27 @@ let evaluator = {
             enumerable: true,
             configable: true
         })
+    },
+    AssignmentExpression(node) {
+        if (node.children.length === 1) {
+            return evaluate(node.children[0])
+        }
+        let left = evaluate(node.children[0]);
+        let right = evaluate(node.children[2]);
+        left.set(right);
+    },
+    Identifier(node) {
+        let runningEC = ecs[ecs.length - 1];
+        return new Reference(runningEC.lexicalEnvironment, node.name)
     }
 }
 
+let realm = new Realm();
+let ecs = [new ExecutionContext];
+
 function evaluate(node) {
     if (evaluator[node.type]) {
-        return evaluator[node.type](node)
+        return evaluator[node.type](node);
     }
 }
 
