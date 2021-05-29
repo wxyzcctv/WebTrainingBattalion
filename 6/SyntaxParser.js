@@ -161,6 +161,39 @@ function parse(source) {
     return reduce()
 }
 
+class Realm {
+    constructor() {
+        this.global = new Map(),
+            this.Object = new Map(),
+            this.Object.call = function () {
+
+            },
+            this.Object_prototype = new Map()
+    }
+}
+
+class EnvironmentRecord {
+    constructor() {
+        this.thisValue;
+        this.variables = new Map();
+        this.outer = null;
+    }
+}
+
+// JavaScript变量存储的地方
+class ExecutionContext {
+    constructor() {
+        this.lexicalEnvironment = {};
+        this.variableEnvironment = {};
+        this.realm = {
+
+        }
+    }
+}
+
+let realm = new Realm();
+let ecs = [new ExecutionContext]
+
 let evaluator = {
     Program(node) {
         return evaluate(node.children[0])
