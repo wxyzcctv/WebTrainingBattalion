@@ -238,6 +238,7 @@ let evaluator = {
             value = value * n + c;
         }
         console.log(value);
+        return value;
         // return evaluate(node.children[0]);
     },
     StringLiteral(node) {
@@ -278,17 +279,34 @@ let evaluator = {
         }
         if (node.children.length === 3) {
             let object = new Map();
-
+            this.PropertyList(node.children[1], object)
             // object.prototype = 
+            console.log(object)
             return object;
         }
 
     },
-    PropertyList(node, Object) {
-
+    PropertyList(node, object) {
+        if (node.children.length === 1) {
+            this.Property(node.children[0], object)
+        } else {
+            this.PropertyList(node.children[0], object)
+            this.Property(node.children[2], object)
+        }
     },
-    Property(node, Object) {
-
+    Property(node, object) {
+        let name;
+        if (node.children[0].type === "Identifier") {
+            name = node.children[0].name
+        } else if (node.children[0].type === "StringLiteral") {
+            name = evaluate(node.children[0]);
+        }
+        object.set(name, {
+            value: evaluate(node.children[2]),
+            writable: true,
+            enumerable: true,
+            configable: true
+        })
     }
 }
 
