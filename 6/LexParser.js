@@ -59,7 +59,7 @@ export function* scan(str) {
         StringLiteral: /\"(?:[^"\n]|\\[\s\S])*\"|\'(?:[^'\n]|\\[\s\S])*\'/,
         NullLiteral: /null/,
         Identifier: /[a-zA-z_$][a-zA-Z0-9_$]*/,
-        Keywords: /if|else|for|function|let|var/,
+        Keywords: /if|else|for|function|let|var|new/,
         Punctuator: /\|\||\&\&|\,|\+|\?|\:|\{|\}|\.|\(|\=|\<|\+\+|\=\=\=|\=\>|\*|\)|\[|\]|;/,
     }, "g", "InputElement");
 
