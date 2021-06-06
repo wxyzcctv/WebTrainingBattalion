@@ -77,7 +77,7 @@ export class JSNumber extends JSValue {
         return this;
     }
     toBoolean() {
-        if (new Float64Array(this.memory)[0] = 0) {
+        if (new Float64Array(this.memory)[0] === 0) {
             return new JSBoolean(false)
         } else {
             return new JSBoolean(true)

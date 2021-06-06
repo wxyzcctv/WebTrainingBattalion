@@ -59,8 +59,8 @@ export function* scan(str) {
         StringLiteral: /\"(?:[^"\n]|\\[\s\S])*\"|\'(?:[^'\n]|\\[\s\S])*\'/,
         NullLiteral: /null/,
         Identifier: /[a-zA-z_$][a-zA-Z0-9_$]*/,
-        Keywords: /if|else|for|function|let|var|new/,
-        Punctuator: /\|\||\&\&|\,|\+|\?|\:|\{|\}|\.|\(|\=|\<|\+\+|\=\=\=|\=\>|\*|\)|\[|\]|;/,
+        Keywords: /if|else|for|function|let|var|new|while/,
+        Punctuator: /\|\||\&\&|\-|\,|\+|\?|\:|\{|\}|\.|\(|\=|\<|\+\+|\=\=\=|\=\>|\*|\)|\[|\]|;/,
     }, "g", "InputElement");
 
     // 正则中[\s\S]表示任意字符,Token中Keywords一定是在Identifier之前，在前括号后加入?:表示的是非捕获分组，即只匹配，不保存
