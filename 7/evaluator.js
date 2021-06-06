@@ -1,4 +1,16 @@
-import { ExecutionContext, Reference, Realm, EnvironmentRecord } from "./runtime.js"
+import {
+    ExecutionContext,
+    Reference,
+    Realm,
+    EnvironmentRecord,
+    JSObject,
+    JSNumber,
+    JSString,
+    JSBoolean,
+    JSNull,
+    JSSymbol,
+    JSUndefined
+} from "./runtime.js"
 export class Evaluator {
     constructor() {
         this.realm = new Realm();
@@ -18,7 +30,7 @@ export class Evaluator {
         if (condition instanceof Reference) {
             condition = condition.get();
         }
-        if (condition) {
+        if (condition.toBoolean().value) {
             return this.evaluate(node.children[4])
         }
     }
@@ -35,7 +47,7 @@ export class Evaluator {
     }
     VariableDeclaration(node) {
         let runningEC = this.ecs[this.ecs.length - 1];
-        runningEC.variableEnvironment[node.children[1].name];
+        runningEC.variableEnvironment[node.children[1].name] = new JSUndefined;
     }
     ExpressionStatement(node) {
         return this.evaluate(node.children[0])
@@ -109,7 +121,7 @@ export class Evaluator {
             value = value * n + c;
         }
         //console.log(value);
-        return value;
+        return new JSNumber(node.value);
         // return evaluate(node.children[0]);
     }
     StringLiteral(node) {
@@ -142,14 +154,14 @@ export class Evaluator {
             }
         }
         //console.log(result);
-        return result.join("");
+        return new JSString(result);
     }
     ObjectLiteral(node) {
         if (node.children.length === 2) {
             return {}
         }
         if (node.children.length === 3) {
-            let object = new Map();
+            let object = new JSObject;
             this.PropertyList(node.children[1], object)
             // object.prototype = 
             //console.log(object)
@@ -178,6 +190,16 @@ export class Evaluator {
             enumerable: true,
             configable: true
         })
+    }
+    BooleanLiteral(node) {
+        if (node.value === 'false') {
+            return new JSBoolean(false)
+        } else {
+            return new JSBoolean(true)
+        }
+    }
+    null() {
+        return new JSNull()
     }
     AssignmentExpression(node) {
         if (node.children.length === 1) {
