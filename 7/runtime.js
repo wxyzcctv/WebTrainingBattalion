@@ -15,11 +15,12 @@ export class Reference {
         this.property = property
     }
     set(value) {
-        // this.object.set(this.property, value);
-        this.object[this.property] = value;
+        this.object.set(this.property, value);
+        // this.object[this.property] = value;
     }
     get() {
-        return this.object[this.property]
+        return this.object.get(this.property);
+        // return this.object[this.property]
     }
 }
 
@@ -133,11 +134,22 @@ export class JSObject extends JSValue {
         this.properties = new Map();
         this.prototype = proto || null;
     }
+    set(name, value) {
+        this.setPropoty(name, {
+            value: value,
+            enumerable: true,
+            configurable: true,
+            writeable: true
+        })
+    }
+    get(name) {
+        return this.getPropoty(name).value;
+    }
     setPropoty(name, attributes) {
         this.properties.set(name, attributes)
     }
-    getPropoty(name, attributes) {
-        // TODO
+    getPropoty(name) {
+        return this.properties.get(name)
     }
     setPrototype(proto) {
         this.prototype = proto;
@@ -176,10 +188,47 @@ export class JSSymbol extends JSValue {
 }
 
 export class EnvironmentRecord {
-    constructor() {
-        this.thisValue;
+    constructor(outer) {
+        this.outer = outer;
         this.variables = new Map();
         this.outer = null;
+    }
+    add(name) {
+        this.variables.set(name, new JSUndefined)
+    }
+    get(name) {
+        if (this.variables.has(name)) {
+            return this.variables.get(name)
+        } else if (this.outer) {
+            return this.outer.get(name)
+        } else {
+            return JSUndefined;
+        }
+    }
+    set(name, value = new JSUndefined) {
+        if (this.variables.has(name)) {
+            return this.variables.set(name, value)
+        } else if (this.outer) {
+            return this.outer.set(name, value)
+        } else {
+            return this.variables.set(name, value);
+        }
+
+    }
+}
+export class ObjectEnvironmentRecord {
+    constructor(object, outer) {
+        this.object = object;
+        this.outer = outer;
+    }
+    add(name) {
+        this.object.set(name, new JSUndefined)
+    }
+    get(name) {
+        return this.object.get(name);
+    }
+    set(name, value = new JSUndefined) {
+        this.object.set(name, value)
     }
 }
 // 记录语句执行完

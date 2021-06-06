@@ -2,7 +2,6 @@ import {
     ExecutionContext,
     Reference,
     Realm,
-    EnvironmentRecord,
     JSObject,
     JSNumber,
     JSString,
@@ -10,13 +9,19 @@ import {
     JSNull,
     JSSymbol,
     JSUndefined,
-    ComplationRecord
+    ComplationRecord,
+    EnvironmentRecord,
+    ObjectEnvironmentRecord
 } from "./runtime.js"
 export class Evaluator {
     constructor() {
         this.realm = new Realm();
-        this.globalObject = {};
-        this.ecs = [new ExecutionContext(this.realm, this.globalObject)];
+        this.globalObject = new JSObject;
+        this.ecs = [
+            new ExecutionContext(this.realm,
+                new ObjectEnvironmentRecord(this.globalObject),
+                new ObjectEnvironmentRecord(this.globalObject)
+            )];
     }
     evaluate(node) {
         if (this[node.type]) {
@@ -77,11 +82,15 @@ export class Evaluator {
     }
     VariableDeclaration(node) {
         let runningEC = this.ecs[this.ecs.length - 1];
-        runningEC.variableEnvironment[node.children[1].name] = new JSUndefined;
+        runningEC.variableEnvironment.add(node.children[1].name);
         return new ComplationRecord('normal', new JSUndefined);
     }
     ExpressionStatement(node) {
-        return new ComplationRecord('normal', this.evaluate(node.children[0]))
+        let result = this.evaluate(node.children[0])
+        if (result instanceof Reference) {
+            result = result.get();
+        }
+        return new ComplationRecord('normal', result)
     }
     Expression(node) {
         return this.evaluate(node.children[0])
@@ -99,7 +108,7 @@ export class Evaluator {
                 right = right.get()
             }
             if (node.children[1].type === "+") {
-                return left + right
+                return new JSNumber(left.value + right.value)
             }
             if (node.children[1].type === "-") {
                 return new JSNumber(left.value - right.value)
