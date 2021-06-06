@@ -182,3 +182,11 @@ export class EnvironmentRecord {
         this.outer = null;
     }
 }
+// 记录语句执行完
+export class ComplationRecord {
+    constructor(type, value, target) {
+        this.type = type || "normal";
+        this.value = value || new JSUndefined;
+        this.target = target || null;
+    }
+}

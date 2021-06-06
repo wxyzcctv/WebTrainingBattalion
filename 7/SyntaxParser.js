@@ -12,7 +12,15 @@ let syntax = {
         ["WhileStatement"],
         ["VariableDeclaration"],
         ["FuntionDeclaration"],
-        ["Block"]
+        ["Block"],
+        ["BreackStatement"],
+        ["ContinueStatement"]
+    ],
+    BreackStatement: [
+        ["break", ";"]
+    ],
+    ContinueStatement: [
+        ["continue", ";"]
     ],
     Block: [
         ["{", "StatementList", "}"],

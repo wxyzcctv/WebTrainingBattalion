@@ -9,7 +9,8 @@ import {
     JSBoolean,
     JSNull,
     JSSymbol,
-    JSUndefined
+    JSUndefined,
+    ComplationRecord
 } from "./runtime.js"
 export class Evaluator {
     constructor() {
@@ -41,18 +42,34 @@ export class Evaluator {
                 condition = condition.get();
             }
             if (condition.toBoolean().value) {
-                this.evaluate(node.children[4])
+                let recode = this.evaluate(node.children[4]);
+                if (recode.type === "continue") {
+                    continue;
+                }
+                if (recode.type === "break") {
+                    return new ComplationRecord("normal");
+                }
             } else {
-                break;
+                return new ComplationRecord("normal");
             }
         }
+    }
+    BreackStatement(node) {
+        return new ComplationRecord("break")
+    }
+    ContinueStatement(node) {
+        return new ComplationRecord("continue")
     }
     StatementList(node) {
         if (node.children.length === 1) {
             return this.evaluate(node.children[0])
         } else {
-            this.evaluate(node.children[0]);
-            return this.evaluate(node.children[1]);
+            let recode = this.evaluate(node.children[0]);
+            if (recode.type === "normal") {
+                return this.evaluate(node.children[1]);
+            } else {
+                return recode;
+            }
         }
     }
     Statement(node) {
@@ -61,9 +78,10 @@ export class Evaluator {
     VariableDeclaration(node) {
         let runningEC = this.ecs[this.ecs.length - 1];
         runningEC.variableEnvironment[node.children[1].name] = new JSUndefined;
+        return new ComplationRecord('normal', new JSUndefined);
     }
     ExpressionStatement(node) {
-        return this.evaluate(node.children[0])
+        return new ComplationRecord('normal', this.evaluate(node.children[0]))
     }
     Expression(node) {
         return this.evaluate(node.children[0])
