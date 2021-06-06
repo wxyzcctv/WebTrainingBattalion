@@ -305,4 +305,11 @@ export class Evaluator {
         let runningEC = this.ecs[this.ecs.length - 1];
         return new Reference(runningEC.lexicalEnvironment, node.name)
     }
+    Block(node) {
+        if (node.children.length === 2) {
+            return
+        } else {
+            return this.evaluate(node.children[1])
+        }
+    }
 }

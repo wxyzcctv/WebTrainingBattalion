@@ -11,7 +11,12 @@ let syntax = {
         ["IfStatement"],
         ["WhileStatement"],
         ["VariableDeclaration"],
-        ["FuntionDeclaration"]
+        ["FuntionDeclaration"],
+        ["Block"]
+    ],
+    Block: [
+        ["{", "StatementList", "}"],
+        ["{", "}"]
     ],
     IfStatement: [
         ["if", "(", "Expression", ")", "Statement"]
