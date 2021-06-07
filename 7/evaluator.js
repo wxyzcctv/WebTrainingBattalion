@@ -17,6 +17,11 @@ export class Evaluator {
     constructor() {
         this.realm = new Realm();
         this.globalObject = new JSObject;
+        this.globalObject.set("log", new JSObject);
+        this.globalObject.get("log").call = args => {
+            console.log(args);
+        };
+
         this.ecs = [
             new ExecutionContext(this.realm,
                 new ObjectEnvironmentRecord(this.globalObject),
@@ -301,6 +306,9 @@ export class Evaluator {
         if (node.children.length === 2) {
             let func = this.evaluate(node.children[0]);
             let args = this.evaluate(node.children[1]);
+            if (func instanceof Reference) {
+                func = func.get()
+            }
             return func.call(args);
 
             // let object = this.realm.Object.construct();
@@ -331,6 +339,28 @@ export class Evaluator {
     Identifier(node) {
         let runningEC = this.ecs[this.ecs.length - 1];
         return new Reference(runningEC.lexicalEnvironment, node.name)
+    }
+    Arguments(node) {
+        if (node.children.length === 2) {
+            return [];
+        } else {
+            return this.evaluate(node.children[1]);
+        }
+    }
+    ArgumentList(node) {
+        if (node.children.length === 1) {
+            let result = this.evaluate(node.children[0]);
+            if (result instanceof Reference) {
+                result = result.get()
+            }
+            return [result];
+        } else {
+            let result = this.evaluate(node.children[2]);
+            if (result instanceof Reference) {
+                result = result.get()
+            }
+            return this.evaluate(node.children[0]).concat(result);
+        }
     }
     Block(node) {
         if (node.children.length === 2) {

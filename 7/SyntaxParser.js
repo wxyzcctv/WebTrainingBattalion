@@ -79,6 +79,10 @@ let syntax = {
         ['(', ')'],
         ['(', 'ArgumentList', ')']
     ],
+    ArgumentList: [
+        ["AssignmentExpression"],
+        ["ArgumentList", ",", "AssignmentExpression"],
+    ],
     NewExpression: [
         ["MemberExpression"],
         ["new", "NewExpression"]
