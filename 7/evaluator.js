@@ -82,7 +82,7 @@ export class Evaluator {
     }
     VariableDeclaration(node) {
         let runningEC = this.ecs[this.ecs.length - 1];
-        runningEC.variableEnvironment.add(node.children[1].name);
+        runningEC.lexicalEnvironment.add(node.children[1].name);
         return new ComplationRecord('normal', new JSUndefined);
     }
     ExpressionStatement(node) {
@@ -335,8 +335,17 @@ export class Evaluator {
     Block(node) {
         if (node.children.length === 2) {
             return
-        } else {
-            return this.evaluate(node.children[1])
         }
+        let runningEC = this.ecs[this.ecs.length - 1];
+        let newEC = new ExecutionContext(
+            runningEC.result,
+            new EnvironmentRecord(runningEC.lexicalEnvironment),
+            runningEC.variableEnvironment
+        )
+        this.ecs.push(newEC);
+        let result = this.evaluate(node.children[1]);
+        this.ecs.pop(newEC)
+        return result;
+
     }
 }
