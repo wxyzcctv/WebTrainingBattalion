@@ -11,7 +11,7 @@ let syntax = {
         ["IfStatement"],
         ["WhileStatement"],
         ["VariableDeclaration"],
-        ["FuntionDeclaration"],
+        ["FunctionDeclaration"],
         ["Block"],
         ["BreackStatement"],
         ["ContinueStatement"]
@@ -36,7 +36,7 @@ let syntax = {
         ["var", "Identifier", ";"],
         ["let", "Identifier", ";"]
     ],
-    FuntionDeclaration: [
+    FunctionDeclaration: [
         ["function", "Identifier", "(", ")", "{", "StatementList", "}"]
     ],
     ExpressionStatement: [

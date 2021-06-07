@@ -9,7 +9,7 @@ import {
     JSNull,
     JSSymbol,
     JSUndefined,
-    ComplationRecord,
+    CompletionRecord,
     EnvironmentRecord,
     ObjectEnvironmentRecord
 } from "./runtime.js"
@@ -27,6 +27,16 @@ export class Evaluator {
                 new ObjectEnvironmentRecord(this.globalObject),
                 new ObjectEnvironmentRecord(this.globalObject)
             )];
+    }
+    evaluateModule(node) {
+        let globalEC = this.ecs[0];
+        let newEC = new ExecutionContext(this.realm,
+            new EnvironmentRecord(globalEC.lexicalEnvironment),
+            new EnvironmentRecord(globalEC.lexicalEnvironment));
+        this.ecs.push(newEC);
+        let result = this.evaluate(node);
+        this.ecs.pop();
+        return result;
     }
     evaluate(node) {
         if (this[node.type]) {
@@ -57,18 +67,18 @@ export class Evaluator {
                     continue;
                 }
                 if (recode.type === "break") {
-                    return new ComplationRecord("normal");
+                    return new CompletionRecord("normal");
                 }
             } else {
-                return new ComplationRecord("normal");
+                return new CompletionRecord("normal");
             }
         }
     }
     BreackStatement(node) {
-        return new ComplationRecord("break")
+        return new CompletionRecord("break")
     }
     ContinueStatement(node) {
-        return new ComplationRecord("continue")
+        return new CompletionRecord("continue")
     }
     StatementList(node) {
         if (node.children.length === 1) {
@@ -88,14 +98,14 @@ export class Evaluator {
     VariableDeclaration(node) {
         let runningEC = this.ecs[this.ecs.length - 1];
         runningEC.lexicalEnvironment.add(node.children[1].name);
-        return new ComplationRecord('normal', new JSUndefined);
+        return new CompletionRecord('normal', new JSUndefined);
     }
     ExpressionStatement(node) {
         let result = this.evaluate(node.children[0])
         if (result instanceof Reference) {
             result = result.get();
         }
-        return new ComplationRecord('normal', result)
+        return new CompletionRecord('normal', result)
     }
     Expression(node) {
         return this.evaluate(node.children[0])
@@ -377,5 +387,24 @@ export class Evaluator {
         this.ecs.pop(newEC)
         return result;
 
+    }
+    FunctionDeclaration(node) {
+        let name = node.children[1].name;
+        let code = node.children[node.children.length - 2];
+        let func = new JSObject;
+        func.call = args => {
+            let newEC = new ExecutionContext(
+                this.realm,
+                new EnvironmentRecord(func.environment),
+                new EnvironmentRecord(func.environment));
+            this.ecs.push(newEC);
+            this.evaluate(code);
+            this.ecs.pop()
+        }
+        let runningEC = this.ecs[this.ecs.length - 1];
+        runningEC.lexicalEnvironment.add(name);
+        runningEC.lexicalEnvironment.set(name, func);
+        func.environment = runningEC.lexicalEnvironment;
+        return new CompletionRecord("normal")
     }
 }

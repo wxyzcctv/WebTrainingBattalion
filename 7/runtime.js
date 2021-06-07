@@ -232,7 +232,7 @@ export class ObjectEnvironmentRecord {
     }
 }
 // 记录语句执行完
-export class ComplationRecord {
+export class CompletionRecord {
     constructor(type, value, target) {
         this.type = type || "normal";
         this.value = value || new JSUndefined;
