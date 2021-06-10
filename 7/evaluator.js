@@ -378,7 +378,7 @@ export class Evaluator {
         }
         let runningEC = this.ecs[this.ecs.length - 1];
         let newEC = new ExecutionContext(
-            runningEC.result,
+            runningEC.realm,
             new EnvironmentRecord(runningEC.lexicalEnvironment),
             runningEC.variableEnvironment
         )

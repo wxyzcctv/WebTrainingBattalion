@@ -26,12 +26,12 @@ export class Reference {
 
 export class Realm {
     constructor() {
-        this.global = new Map(),
-            this.Object = new Map(),
-            this.Object.call = function () {
+        this.global = new Map();
+        this.Object = new Map();
+        this.Object.call = function () {
 
-            },
-            this.Object_prototype = new Map()
+        };
+        this.Object_prototype = new Map()
     }
 }
 
@@ -191,7 +191,6 @@ export class EnvironmentRecord {
     constructor(outer) {
         this.outer = outer;
         this.variables = new Map();
-        this.outer = null;
     }
     add(name) {
         this.variables.set(name, new JSUndefined)
