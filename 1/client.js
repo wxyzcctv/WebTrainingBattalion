@@ -13,6 +13,7 @@ class Request {
         }
 
         if (this.headers["Content-Type"] === "aplication/json") {
+            // 实际请求头中的Content-Type有很多种可能，此处只设计了aplication/json
             this.bodyText = JSON.stringify(this.body)
         } else if (this.headers["Content-Type"] === "application/x-www-form-urlencoded") {
             this.bodyText = Object.keys(this.body).map(key => `${key}=${encodeURIComponent(this.body[key])}`).join('&');
@@ -104,6 +105,7 @@ class ResponseParser {
             } else if (char === '\r') {
                 this.current = this.WAITING_HEADER_BLOCK_END
                 if (this.headers['Transfer-Encoding'] === 'chunked') {
+                    // 此处实际中的Transfer-Encoding可以有很多可能，但node作为后端返回时为chunked
                     this.bodyParser = new TrunkedBodyParder();
                 }
             } else {
@@ -137,6 +139,8 @@ class ResponseParser {
 }
 
 class TrunkedBodyParder {
+    // TrunkedBody的结构是先一个16进制的数表示内容长度，后紧跟内容
+    // 在读取到的内容长度为设置长度时读取下一个内容，READING_TRUNK就是记录这个状态
     constructor() {
         this.WAITING_LENGTH = 0;
         this.WAITING_LENGTH_LINE_END = 1;
@@ -200,4 +204,12 @@ void async function () {
     let response = await request.send();
     console.log(response);
 }();
-
+// 在使用立即执行的函数表达式时，可以利用 void 运算符让 JavaScript 引擎把一个function关键字识别成函数表达式而不是函数声明（语句）
+// 还可以使用以下方式
+// +function(){ }()
+// -function(){ }()
+// !function(){ }()
+// ~function(){ }()
+// viod function(){ }()
+// (function(){ })()
+// (function(){ }())
