@@ -1,3 +1,3 @@
-module.exports.parseHTML = function parserHTML(html) {
+module.exports.parserHTML = function parserHTML(html) {
     console.log(html);
 }

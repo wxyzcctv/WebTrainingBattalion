@@ -200,6 +200,6 @@ void async function () {
     });
     let response = await request.send();
 
-    let dom = parser.parderHTML(response.body)
+    let dom = parser.parserHTML(response.body)
 }();
 

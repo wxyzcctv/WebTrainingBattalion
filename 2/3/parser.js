@@ -10,7 +10,8 @@ function data(c) {
         return data
     }
 }
-
+// 标签开始，接/表示结束标签，接英文单词表示标签名，
+// 接其他字符如?\!就直接return，报错
 function tagOpen(c) {
     if (c === '/') {
         // <之后如果为/就表示此时为结束标签开始
@@ -35,7 +36,7 @@ function endTagOpen(c) {
 
     }
 }
-
+// 此处是没有考虑是从那个状态跳转过来的，如果是结束标签跳转过来的时候只能跳转到>才行
 function tagName(c) {
     if (c.match(/^[\t\n\f ]$/)) {
         // tagName之后紧跟着的是空白符就进入属性名状态
@@ -53,7 +54,7 @@ function tagName(c) {
         return tagName
     }
 }
-
+// 此时没有对属性的解析做处理，一直等待处理>
 function beforAttributeName(c) {
     if (c.match(/^[\t\n\g ]$/)) {
         return beforAttributeName;
@@ -70,6 +71,7 @@ function selfClosingStartTag(c) {
     if (c === '>') {
         // 自闭合标签后面只有接>才是有效的,其余的都是会报错
         currentToken.isSelfClosing = true;
+        return data;
     } else if (c === 'EOF') {
 
     } else {
