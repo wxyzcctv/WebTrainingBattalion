@@ -39,6 +39,7 @@ function emit(token) {
         }
         currentTextNode = null
     } else if (token.type === "text") {
+        // 在处理文本节点的时候与自封闭标签处理是类似的，但多文本节点需要合并
         // 如果文本节点为空就创建一个新的文本节点
         if (currentTextNode === null) {
             currentTextNode = {

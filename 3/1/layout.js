@@ -30,7 +30,7 @@ function layout(element) {
         return
     }
     // 过滤掉文本节点
-    var items = element.children.filter(e => e.style === 'element')
+    var items = element.children.filter(e => e.type === 'element')
     // 进行sort排序是为了支持flex中的order属性
     items.sort(function (a, b) {
         return (a.order || 0) - (b.order || 0);

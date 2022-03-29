@@ -16,6 +16,7 @@ function addCSSRules(text) {
 
 // css的计算是假定在startTag入栈时，此处假设所有的css规则已经收集完毕了
 function computedCSS(element) {
+    // 以下是获取当前元素的父元素序列
     // 一个数组调用slice方法不传参数时表示对该数组进行了复制，在调用一下reverse是为了实现匹配元素是从内向外匹配
     var elements = stack.slice().reverse()
 }

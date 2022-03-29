@@ -67,6 +67,8 @@ function computedCSS(element) {
                 if (!computedStyle[declaration.property]) {
                     computedStyle[declaration.property] = {}
                 }
+                // 简单的匹配后就赋值css规则会存在覆盖的情况，这个时候需要考虑优先级的问题,
+                // 当当前css规则优先级高于之前css规则的优先级时覆盖之前的
                 if (!computedStyle[declaration.property].specificity) {
                     computedStyle[declaration.property].value = declaration.value;
                     computedStyle[declaration.property].specificity = sp
@@ -79,7 +81,7 @@ function computedCSS(element) {
         }
     }
 }
-
+// 使用四元祖的方式构建css的优先级
 function specificity(selector) {
     var p = [0, 0, 0, 0];
     var selectorParts = selector.split(" ");
@@ -95,7 +97,7 @@ function specificity(selector) {
     }
     return p;
 }
-
+// 比较优先级，越往左优先级越高
 function compare(sp1, sp2) {
     if (sp1[0] - sp2[0]) {
         return sp1[0] - sp2[0]

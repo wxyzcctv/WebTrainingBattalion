@@ -124,8 +124,8 @@ function layout(element) {
         for (let i = 0; i < items.length; i++) {
             var item = items[i];
             // 如果子元素的主轴尺寸不为null或者0时，主轴尺寸就等于所有子元素主轴尺寸之和
-            if (itemStyle[mainSize] !== null || itemStyle[mainSize] !== (void 0)) {
-                elementStyle[mainSize] = elementStyle[mainSize] + itemStyle[mainSize]
+            if (item.style[mainSize] !== null || item.style[mainSize] !== (void 0)) {
+                elementStyle[mainSize] = elementStyle[mainSize] + item.style[mainSize]
             }
         }
         isAutoMainSize = true;
@@ -176,14 +176,14 @@ function layout(element) {
                 // 将新行加入到flex布局数组中
                 flexLines.push(flexLine)
                 // 重置主轴尺寸和交叉轴尺寸
-                mainSize = style[mainSize]
+                mainSpace = style[mainSize]
                 crossSpace = 0;
             } else {
                 // 当前元素能放入flex中的一行中就直接放入
                 flexLine.push(item)
             }
             // 获取最大交叉轴的值
-            if (itemStyle[crossSize !== null && itemStyle[crossSize] !== (void 0)]) {
+            if (itemStyle[crossSize] !== null && itemStyle[crossSize] !== (void 0)) {
                 crossSpace = Math.max(crossSpace, itemStyle[crossSize]);
 
             }

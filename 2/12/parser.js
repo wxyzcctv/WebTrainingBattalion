@@ -18,6 +18,7 @@ function match(element, selector) {
     if (!element.attributes || !selector) {
         return false
     }
+    // 这里只是简单的匹配一个id和一个class，没有考虑复合的class值和id值
     if (selector.charAt(0) === "#") {
         var attr = element.attributes.filter(attr => attr.name === 'id')[0];
         if (attr && attr.value === selector.replace('#', "")) {

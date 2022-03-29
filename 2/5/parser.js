@@ -32,6 +32,7 @@ function tagOpen(c) {
         return endTagOpen
     } else if (c.match(/^[a-zA-Z]$/)) {
         // <之后为字母就表示为标签名，跳转到标签名状态机
+        // 这样定义type为标签标志会在解析<input type="text">的属性时存在问题
         currentToken = {
             type: "startTag",
             tagName: ""
@@ -78,7 +79,7 @@ function tagName(c) {
         return tagName
     }
 }
-// 处理标签属性的状态
+// 处理标签属性的状态 一个标签可以有多个属性，多个属性之间使用空格进行间隔
 function beforAttributeName(c) {
     if (c.match(/^[\t\n\g ]$/)) {
         // 如果遇到的是空格就继续返回到处理标签属性的状态
@@ -99,7 +100,7 @@ function beforAttributeName(c) {
     }
 }
 
-function attributeName(c){
+function attributeName(c) {
     if (c.match(/^[\t\n\f ]$/) || c === '/' || c === '>' || c === EOF) {
         // 属性名状态中遇到空格、/、>、EOF就进入到属性名之后的状态机，表示已经获取到了属性名
         return afterAttributeName(c)
@@ -107,17 +108,18 @@ function attributeName(c){
         // 属性名后紧跟的是=就条状到属性值状态处理前
         return beforAttributeValue;
     } else if (c === '\u0000') {
-        
+        // ASCII的\u0000是null
     } else if (c === '\"' || c === "" || c === "<") {
-        
+
     } else {
         currentAttribute.name += c
         return attributeName;
     }
 }
 
-function beforAttributeValue(c){
+function beforAttributeValue(c) {
     if (c.match(/^[\t\n\f ]$/) || c === "/" || c === ">" || c === EOF) {
+        // 感觉此处应该是直接报错，返回到beforAttributeName状态也不是很合理，不然此处就假设书写的html标签在属性=后是有值的
         return beforAttributeValue;
     } else if (c === "\"") {
         // 如果属性名后的=后接的是"开头的就跳转到双引号属性值状态
@@ -139,9 +141,9 @@ function doubleQuotedAttributeValue(c) {
         currentToken[currentAttribute.name] = currentAttribute.value;
         return afterQuotedAttributeValue;
     } else if (c === "\u0000") {
-        
+
     } else if (c === EOF) {
-        
+
     } else {
         // 不然就保存获取到的属性值
         currentAttribute.value += c;
@@ -155,9 +157,9 @@ function singleQuotedAttributeValue(c) {
         currentToken[currentAttribute.name] = currentAttribute.value;
         return afterQuotedAttributeValue;
     } else if (c === "\u0000") {
-        
+
     } else if (c === EOF) {
-        
+
     } else {
         // 不然就保存获取到的属性值
         currentAttribute.value += c;
@@ -178,11 +180,11 @@ function UnquotedAttributeValue(c) {
         emit(currentToken)
         return data;
     } else if (c === "\u0000") {
-        
+
     } else if (c === "\"" || c === "'" || c === "<" || c === "=" || c === "`") {
-        
+
     } else if (c === EOF) {
-        
+
     } else {
         // 不然就保存获取到的属性值
         currentAttribute.value += c;
@@ -195,14 +197,15 @@ function afterQuotedAttributeValue(c) {
         return beforAttributeName
     } else if (c === "/") {
         return selfClosingStartTag
-    } else if (c===">") {
+    } else if (c === ">") {
         currentToken[currentAttribute.name] = currentAttribute.value
         emit(currentToken);
         return data;
     } else if (c === EOF) {
-        
+
     } else {
         currentAttribute.value += c;
+        // 在引用符号后面还没有结束标记时就继续向当前属性添加值，哪怕是已经遇到了结束属性值符号
         return doubleQuotedAttributeValue
     }
 }
@@ -219,8 +222,9 @@ function afterAttributeName(c) {
         emit(currentToken)
         return data
     } else if (c === EOF) {
-        
+
     } else {
+        // 如果一个标签的属性名没有接=，后面空一格之后接另外的属性名就是新增另一个的属性了
         currentToken[currentAttribute.name] = currentAttribute.value
         currentAttribute = {
             name: "",

@@ -30,7 +30,7 @@ function layout(element) {
         return
     }
     // 过滤掉文本节点
-    var items = element.children.filter(e => e.style === 'element')
+    var items = element.children.filter(e => e.type === 'element')
     // 进行sort排序是为了支持flex中的order属性
     items.sort(function (a, b) {
         return (a.order || 0) - (b.order || 0);
@@ -52,18 +52,18 @@ function layout(element) {
         style.alignItems = "stretch"
     }
     if (!style.justifyContent || style.justifyContent === "auto") {
-        style.justifyContent === "flex-start"
+        style.justifyContent = "flex-start"
     }
     if (!style.flexWrap || style.flexWrap === "auto") {
-        style.flexWrap = "nowarp"
+        style.flexWrap = "nowrap"
     }
-    if (!style.alignContent || style.alignItems === "auto") {
+    if (!style.alignContent || style.alignContent === "auto") {
         style.alignContent = "stretch"
     }
 
     var mainSize, mainStart, mainEnd, mainSign, mainBase, crossSize, crossStart, crossEnd, crossSign, crossBase;
     // 设置主轴交叉轴属性
-    if (style.flexWrap === "row") {
+    if (style.flexDirection === "row") {
         mainSize = "width";
         mainStart = "left";
         mainEnd = "right";
@@ -124,8 +124,8 @@ function layout(element) {
         for (let i = 0; i < items.length; i++) {
             var item = items[i];
             // 如果子元素的主轴尺寸不为null或者0时，主轴尺寸就等于所有子元素主轴尺寸之和
-            if (itemStyle[mainSize] !== null || itemStyle[mainSize] !== (void 0)) {
-                elementStyle[mainSize] = elementStyle[mainSize] + itemStyle[mainSize]
+            if (item.style[mainSize] !== null || item.style[mainSize] !== (void 0)) {
+                elementStyle[mainSize] = elementStyle[mainSize] + item.style[mainSize]
             }
         }
         isAutoMainSize = true;
@@ -151,6 +151,7 @@ function layout(element) {
             // 如果遍历的当前元素具有flex属性，就将当前元素加入到flex布局中的一行中
             flexLine.push(item);
         } else if (style.flexWrap === "nowrap" && isAutoMainSize) {
+            // 感觉这里存在问题，不应该是&&，而应该是||
             // 不需要换行的情况
             // 如果父元素具有nowrap属性并且排除了装一行的情况，每次遍历主轴尺寸减去当前元素主抽尺寸
             mainSpace -= itemStyle[mainSize];
@@ -176,14 +177,14 @@ function layout(element) {
                 // 将新行加入到flex布局数组中
                 flexLines.push(flexLine)
                 // 重置主轴尺寸和交叉轴尺寸
-                mainSize = style[mainSize]
+                mainSpace = style[mainSize]
                 crossSpace = 0;
             } else {
                 // 当前元素能放入flex中的一行中就直接放入
                 flexLine.push(item)
             }
             // 获取最大交叉轴的值
-            if (itemStyle[crossSize !== null && itemStyle[crossSize] !== (void 0)]) {
+            if (itemStyle[crossSize] !== null && itemStyle[crossSize] !== (void 0)) {
                 crossSpace = Math.max(crossSpace, itemStyle[crossSize]);
 
             }
@@ -248,6 +249,7 @@ function layout(element) {
                 var currentMain = mainBase;
                 for (let i = 0; i < items.length; i++) {
                     var item = items[i];
+                    var itemStyle = getStyle(item);
 
                     // 计算具有flex值的元素的主轴尺寸实际填充的主轴尺寸大小
                     if (itemStyle.flex) {
@@ -285,6 +287,8 @@ function layout(element) {
                 // 获取每一个元素的定位
                 for (let i = 0; i < items.length; i++) {
                     var item = items[i];
+                    var itemStyle = getStyle(item);
+
                     itemStyle[mainStart] = currentMain;
                     itemStyle[mainEnd] = itemStyle[mainStart] + mainSign * itemStyle[mainSize];
                     currentMain = itemStyle[mainEnd] + step;
@@ -359,7 +363,7 @@ function layout(element) {
             var align = itemStyle.alignSelf || style.alignItems;
 
             // 如果没有指定元素的交叉轴尺寸就通过stretch属性进行判断
-            if (itemStyle[crossSize] === null) {
+            if (itemStyle[crossSize] === null || itemStyle[crossSize] === undefined) {
                 itemStyle[crossSize] = (align === 'stretch') ? lineCrossSize : 0
             }
             if (align === 'flex-start') {
@@ -376,7 +380,7 @@ function layout(element) {
             }
             if (align === 'stretch') {
                 itemStyle[crossStart] = crossBase;
-                itemStyle[crossEnd] = crossBase + crossSign * ((itemStyle[crossSize] !== null && itemStyle[crossSize] !== (void 0)) ? itemStyle[crossSize] : lineCrossSize);
+                itemStyle[crossEnd] = crossBase + crossSign * ((itemStyle[crossSize] !== null && itemStyle[crossSize] !== (void 0)) ? itemStyle[crossSize] : 0);
 
                 itemStyle[crossSize] = crossSign * (itemStyle[crossEnd] - itemStyle[crossStart])
             }

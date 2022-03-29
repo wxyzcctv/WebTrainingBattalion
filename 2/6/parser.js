@@ -1,21 +1,24 @@
 let currentToken = null
 let currentAttribute = null
 
+// <--- 将解析出来的结果构建为一颗DOM树，构建DOM树主要使用的是栈，栈顶元素是document元素
 let stack = [{ type: "document", children: [] }]
 
 function emit(token) {
+    // 此处展示不处理文本节点
     if (token.type === 'text') return;
     let top = stack[stack.length - 1];
-
+    // 当获取的tag是startTag时，需要入栈和读取元素的属性构建树的操作
     if (token.type === "startTag") {
+        // 遇到一个开始标签，先创建一个element的元素对象
         let element = {
             type: "element",
             children: [],
             attributes: []
         };
-
+        // 获取element的tagName
         element.tagName = token.tagName;
-
+        // 对传入的标签对象进行遍历，获得该标签的属性
         for (let p in token) {
             if (p !== "type" && p !== "tagName") {
                 element.attributes.push({
@@ -24,14 +27,18 @@ function emit(token) {
                 })
             }
         }
+        // 获取的栈顶元素中添加构建的element元素对象
         top.children.push(element);
         element.parent = top
 
+        // 如果是自封闭标签不会进入栈中，非自封闭标签进入栈中作为栈顶元素
         if (!token.isSelfClosing) {
             stack.push(element)
         }
+        // 此处的currentTextNode没有定义
         currentTextNode = null
     } else if (token.type === "endTag") {
+        // 当获取的tag是endTag时，判断是否能形成封闭标签，此处判断不能直接报错，能则出栈
         if (top.tagName !== token.tagName) {
             throw new Error("Tag start end dosen't match!")
         } else {
@@ -40,6 +47,7 @@ function emit(token) {
         currentTextNode = null
     }
 }
+// 将解析出来的结果构建为一颗DOM树 -->
 
 const EOF = Symbol("EDF");
 
